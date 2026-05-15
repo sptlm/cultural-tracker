@@ -2,26 +2,54 @@
 ### Base URL
 @host = http://localhost:8080
 
-### 1) Obtain session cookie (Spring Security form login)
+### 1) Open login page and capture login CSRF token
+# @name loginPage
+GET {{host}}/login
+
+> {%
+    const token = response.body.match(/name="_csrf" value="([^"]+)"/)?.[1];
+    client.assert(token, "CSRF token was not found on login page");
+    client.global.set("login_csrf_token", token);
+%}
+
+### 2) Obtain session cookie (Spring Security form login)
 # @name login
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
 
-username=admin&password=admin
+username=admin&password=admin&_csrf={{login_csrf_token}}
 > {%
     const cookies = response.headers.valuesOf("Set-Cookie");
     const sessionCookie = cookies.find(cookie => cookie.startsWith("JSESSIONID")) || cookies[0];
     client.global.set("session_cookie", sessionCookie);
 %}
 
-### 2) Create route
+### 3) Open protected form and capture current API CSRF token
+# @name routeForm
+GET {{host}}/routes/new
+Cookie: {{session_cookie}}
+
+> {%
+    const token = response.body.match(/name="_csrf" value="([^"]+)"/)?.[1]
+        || response.body.match(/name="_csrf" content="([^"]+)"/)?.[1];
+    client.assert(token, "CSRF token was not found on route form");
+    client.global.set("csrf_token", token);
+%}
+
+### 4) Create route
 # @name createRoute
 POST {{host}}/api/routes
 Content-Type: application/json
+X-XSRF-TOKEN: {{csrf_token}}
 Cookie: {{session_cookie}}
 
 {
   "title": "Маршрут выходного дня",
+  "description": "Два культурных события на спокойный вечер",
+  "durationMinutes": 120,
+  "budget": 500,
+  "isPublic": true,
+  "eventIds": [1],
   "authorId": 0
 }
 > {%
@@ -32,28 +60,35 @@ Cookie: {{session_cookie}}
     client.global.set("route_id", response.body.id);
 %}
 
-### 3) Read all routes
+### 5) Read all routes
 GET {{host}}/api/routes
 Cookie: {{session_cookie}}
 
-### 4) Read route by id
+### 6) Read route by id
 GET {{host}}/api/routes/{{route_id}}
 Cookie: {{session_cookie}}
 
-### 5) Update route
+### 7) Update route
 PUT {{host}}/api/routes/{{route_id}}
 Content-Type: application/json
+X-XSRF-TOKEN: {{csrf_token}}
 Cookie: {{session_cookie}}
 
 {
   "title": "Обновлённый маршрут на вечер",
+  "description": "Обновлённое описание маршрута",
+  "durationMinutes": 150,
+  "budget": 750,
+  "isPublic": true,
+  "eventIds": [1],
   "authorId": 0
 }
 
-### 6) Delete route
+### 8) Delete route
 DELETE {{host}}/api/routes/{{route_id}}
+X-XSRF-TOKEN: {{csrf_token}}
 Cookie: {{session_cookie}}
 
-### 7) Verify 404 after delete
+### 9) Verify 404 after delete
 GET {{host}}/api/routes/{{route_id}}
 Cookie: {{session_cookie}}

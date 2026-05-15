@@ -1,46 +1,35 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход | Культурный навигатор</title>
-    <link rel="stylesheet" href="/css/auth.css">
-</head>
-<body>
-<main class="shell">
-    <section class="panel auth-panel">
-        <a class="back-link" href="/">На главную</a>
-        <p class="eyebrow">Добро пожаловать</p>
-        <h1>Вход</h1>
+<#import "/layout.ftlh" as layout>
+<@layout.page title="Вход">
+<main class="page-shell auth-shell">
+    <section class="card auth-card shadow-sm">
+        <div class="card-body">
+            <p class="auth-eyebrow">Добро пожаловать</p>
+            <h1>Вход</h1>
 
-        <#if registered??>
-            <div class="notice success">Регистрация прошла успешно. Теперь можно войти.</div>
-        </#if>
-        <#if (RequestParameters.error)??>
-            <div class="notice error">Неверное имя пользователя или пароль.</div>
-        </#if>
-        <#if (RequestParameters.logout)??>
-            <div class="notice success">Вы вышли из аккаунта.</div>
-        </#if>
+            <#if registered??>
+                <div class="alert alert-success">Регистрация прошла успешно. Теперь можно войти.</div>
+            </#if>
+            <#if loginError?? && loginError>
+                <div class="alert alert-danger">Неверное имя пользователя или пароль.</div>
+            </#if>
+            <#if loggedOut?? && loggedOut>
+                <div class="alert alert-success">Вы вышли из аккаунта.</div>
+            </#if>
 
-        <form action="/login" method="post" class="form">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+            <form action="/login" method="post" class="auth-form">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 
-            <label class="field">
-                <span>Имя пользователя</span>
-                <input type="text" name="username" autocomplete="username" required autofocus>
-            </label>
+                <label class="form-label" for="username">Имя пользователя</label>
+                <input id="username" class="form-control" type="text" name="username" autocomplete="username" required autofocus>
 
-            <label class="field">
-                <span>Пароль</span>
-                <input type="password" name="password" autocomplete="current-password" required>
-            </label>
+                <label class="form-label mt-3" for="password">Пароль</label>
+                <input id="password" class="form-control" type="password" name="password" autocomplete="current-password" required>
 
-            <button type="submit" class="button">Войти</button>
-        </form>
+                <button type="submit" class="btn btn-primary w-100 mt-4">Войти</button>
+            </form>
 
-        <p class="switch">Еще нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+            <p class="auth-switch">Еще нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+        </div>
     </section>
 </main>
-</body>
-</html>
+</@layout.page>

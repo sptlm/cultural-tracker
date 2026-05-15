@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -19,7 +20,13 @@ public class AuthController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public String login() {
+    public String login(
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false) String logout,
+            Model model
+    ) {
+        model.addAttribute("loginError", error != null);
+        model.addAttribute("loggedOut", logout != null);
         return "auth/login";
     }
 

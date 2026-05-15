@@ -1,59 +1,46 @@
 <#assign errors = .data_model["org.springframework.validation.BindingResult.registrationRequest"]!>
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация | Культурный навигатор</title>
-    <link rel="stylesheet" href="/css/auth.css">
-</head>
-<body>
-<main class="shell">
-    <section class="panel auth-panel">
-        <a class="back-link" href="/">На главную</a>
-        <p class="eyebrow">Новый аккаунт</p>
-        <h1>Регистрация</h1>
+<#import "/layout.ftlh" as layout>
+<@layout.page title="Регистрация">
+<main class="page-shell auth-shell">
+    <section class="card auth-card shadow-sm">
+        <div class="card-body">
+            <p class="auth-eyebrow">Новый аккаунт</p>
+            <h1>Регистрация</h1>
 
-        <form action="/register" method="post" class="form">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+            <form action="/register" method="post" class="auth-form">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 
-            <label class="field">
-                <span>Имя пользователя</span>
-                <input type="text" name="username" value="${((registrationRequest.username)!)?html}" autocomplete="username" required autofocus>
+                <label class="form-label" for="username">Имя пользователя</label>
+                <input id="username" class="form-control" type="text" name="username" value="${(registrationRequest.username)!}" autocomplete="username" required autofocus data-check-field="/api/auth/check-username" data-check-target="#usernameAvailability">
+                <span id="usernameAvailability" class="small"></span>
                 <#if errors?has_content && errors.hasFieldErrors("username")>
-                    <small>${errors.getFieldError("username").defaultMessage}</small>
+                    <div class="form-error">${errors.getFieldError("username").defaultMessage}</div>
                 </#if>
-            </label>
 
-            <label class="field">
-                <span>Email</span>
-                <input type="email" name="email" value="${((registrationRequest.email)!)?html}" autocomplete="email" required>
+                <label class="form-label mt-3" for="email">Email</label>
+                <input id="email" class="form-control" type="email" name="email" value="${(registrationRequest.email)!}" autocomplete="email" required data-check-field="/api/auth/check-email" data-check-target="#emailAvailability">
+                <span id="emailAvailability" class="small"></span>
                 <#if errors?has_content && errors.hasFieldErrors("email")>
-                    <small>${errors.getFieldError("email").defaultMessage}</small>
+                    <div class="form-error">${errors.getFieldError("email").defaultMessage}</div>
                 </#if>
-            </label>
 
-            <label class="field">
-                <span>Пароль</span>
-                <input type="password" name="password" autocomplete="new-password" required>
+                <label class="form-label mt-3" for="password">Пароль</label>
+                <input id="password" class="form-control" type="password" name="password" autocomplete="new-password" required>
                 <#if errors?has_content && errors.hasFieldErrors("password")>
-                    <small>${errors.getFieldError("password").defaultMessage}</small>
+                    <div class="form-error">${errors.getFieldError("password").defaultMessage}</div>
                 </#if>
-            </label>
 
-            <label class="field">
-                <span>Повторите пароль</span>
-                <input type="password" name="passwordConfirmation" autocomplete="new-password" required>
+                <label class="form-label mt-3" for="passwordConfirmation">Повторите пароль</label>
+                <input id="passwordConfirmation" class="form-control" type="password" name="passwordConfirmation" autocomplete="new-password" required>
                 <#if errors?has_content && errors.hasFieldErrors("passwordConfirmation")>
-                    <small>${errors.getFieldError("passwordConfirmation").defaultMessage}</small>
+                    <div class="form-error">${errors.getFieldError("passwordConfirmation").defaultMessage}</div>
                 </#if>
-            </label>
 
-            <button type="submit" class="button">Создать аккаунт</button>
-        </form>
+                <button type="submit" class="btn btn-primary w-100 mt-4">Создать аккаунт</button>
+            </form>
 
-        <p class="switch">Уже есть аккаунт? <a href="/login">Войти</a></p>
+            <p class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></p>
+        </div>
     </section>
 </main>
-</body>
-</html>
+</@layout.page>

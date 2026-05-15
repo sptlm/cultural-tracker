@@ -1,13 +1,20 @@
 package com.culturalnavigator.service;
 
+import com.culturalnavigator.dto.ProfileForm;
 import com.culturalnavigator.dto.RegistrationRequest;
+import com.culturalnavigator.entity.Category;
 import com.culturalnavigator.entity.Role;
 import com.culturalnavigator.entity.User;
+import com.culturalnavigator.exception.AccessDeniedAppException;
+import com.culturalnavigator.exception.NotFoundException;
+import com.culturalnavigator.repository.CategoryRepository;
 import com.culturalnavigator.repository.RoleRepository;
 import com.culturalnavigator.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,7 +35,9 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final CategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final YandexMapsClient yandexMapsClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -55,6 +65,84 @@ public class UserService implements UserDetailsService {
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.getRoles().add(getOrCreateRole(DEFAULT_ROLE));
         userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public User currentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
+            throw new AccessDeniedAppException("Требуется вход");
+        }
+        return userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + authentication.getName()));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileForm currentProfileForm() {
+        User user = currentUser();
+        ProfileForm form = new ProfileForm();
+        form.setEmail(user.getEmail());
+        form.setPreferredBudget(user.getPreferredBudget());
+        form.setPreferredAddress(user.getPreferredAddress());
+        form.setFavoriteCategoryIds(user.getFavoriteCategories().stream().map(Category::getId).toList());
+        form.setFavoriteCategoryNames(user.getFavoriteCategories().stream()
+                .map(Category::getName)
+                .sorted()
+                .toList());
+        return form;
+    }
+
+    @Transactional
+    public void updateProfile(ProfileForm form, BindingResult bindingResult) {
+        User user = currentUser();
+        String email = form.getEmail() == null ? "" : form.getEmail().trim().toLowerCase();
+        userRepository.findByEmail(email)
+                .filter(existing -> !existing.getId().equals(user.getId()))
+                .ifPresent(existing -> bindingResult.rejectValue("email", "email.exists", "Пользователь с таким email уже существует"));
+        if (bindingResult.hasErrors()) {
+            return;
+        }
+        user.setEmail(email);
+        user.setPreferredBudget(form.getPreferredBudget());
+        user.setPreferredAddress(form.getPreferredAddress() == null || form.getPreferredAddress().isBlank() ? null : form.getPreferredAddress().trim());
+        if (user.getPreferredAddress() == null) {
+            user.setPreferredLatitude(null);
+            user.setPreferredLongitude(null);
+        } else {
+            yandexMapsClient.geocode(user.getPreferredAddress()).ifPresent(result -> {
+                user.setPreferredLongitude(result.longitude());
+                user.setPreferredLatitude(result.latitude());
+            });
+        }
+        user.getFavoriteCategories().clear();
+        if (form.getFavoriteCategoryIds() != null) {
+            form.getFavoriteCategoryIds().stream().distinct()
+                    .map(categoryId -> categoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new NotFoundException("Категория не найдена")))
+                    .forEach(user.getFavoriteCategories()::add);
+        }
+        userRepository.save(user);
+    }
+
+    public boolean currentUserIsAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean usernameAvailable(String username) {
+        return username != null && !username.isBlank() && !userRepository.existsByUsername(username.trim());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean emailAvailable(String email) {
+        return email != null && !email.isBlank() && !userRepository.existsByEmail(email.trim().toLowerCase());
     }
 
     private void validateRegistration(RegistrationRequest request, BindingResult bindingResult) {
