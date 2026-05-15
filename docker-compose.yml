@@ -1,9 +1,6 @@
 services:
   app:
     build: .
-    depends_on:
-      - db
-      - redis
     environment:
       DB_URL: jdbc:postgresql://db:5432/cultural_navigator
       DB_USER: cultural_user
@@ -12,8 +9,17 @@ services:
       REDIS_PORT: 6379
       APP_PORT: 8080
       YANDEX_GEOCODER_API_KEY: ${YANDEX_GEOCODER_API_KEY:-}
-    ports:
-      - "8080:8080"
+    networks:
+      - web_network
+      - cultural_internal
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=web_network
+      - traefik.http.routers.cultural.rule=Host(`ne.${DOMAIN}`)
+      - traefik.http.routers.cultural.entrypoints=web,websecure
+      - traefik.http.routers.cultural.tls.certresolver=myresolver
+      - traefik.http.routers.cultural.service=cultural
+      - traefik.http.services.cultural.loadbalancer.server.port=8080
 
   db:
     image: postgres:16-alpine
@@ -21,15 +27,20 @@ services:
       POSTGRES_DB: cultural_navigator
       POSTGRES_USER: cultural_user
       POSTGRES_PASSWORD: cultural_password
-    ports:
-      - "5433:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - cultural_pg_data:/var/lib/postgresql/data
+    networks:
+      - cultural_internal
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    networks:
+      - cultural_internal
 
 volumes:
-  pg_data:
+  cultural_pg_data:
+
+networks:
+  web_network:
+    external: true
+  cultural_internal:
