@@ -30,6 +30,8 @@ services:
       - traefik.http.services.cultural.loadbalancer.server.port=8080
   db:
     image: postgres:16-alpine
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_DB: ${DB_NAME:-cultural_navigator}
       POSTGRES_USER: ${DB_USER:-cultural_user}

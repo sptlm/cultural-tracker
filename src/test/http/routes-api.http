@@ -12,22 +12,16 @@ GET {{host}}/login
     client.global.set("login_csrf_token", token);
 %}
 
-### 2) Obtain session cookie (Spring Security form login)
+### 2) Login. IntelliJ HTTP Client stores JSESSIONID automatically in its cookie jar.
 # @name login
 POST {{host}}/login
 Content-Type: application/x-www-form-urlencoded
 
 username=admin&password=admin&_csrf={{login_csrf_token}}
-> {%
-    const cookies = response.headers.valuesOf("Set-Cookie");
-    const sessionCookie = cookies.find(cookie => cookie.startsWith("JSESSIONID")) || cookies[0];
-    client.global.set("session_cookie", sessionCookie);
-%}
 
 ### 3) Open protected form and capture current API CSRF token
 # @name routeForm
 GET {{host}}/routes/new
-Cookie: {{session_cookie}}
 
 > {%
     const token = response.body.match(/name="_csrf" value="([^"]+)"/)?.[1]
@@ -41,7 +35,6 @@ Cookie: {{session_cookie}}
 POST {{host}}/api/routes
 Content-Type: application/json
 X-XSRF-TOKEN: {{csrf_token}}
-Cookie: {{session_cookie}}
 
 {
   "title": "Маршрут выходного дня",
@@ -62,17 +55,14 @@ Cookie: {{session_cookie}}
 
 ### 5) Read all routes
 GET {{host}}/api/routes
-Cookie: {{session_cookie}}
 
 ### 6) Read route by id
 GET {{host}}/api/routes/{{route_id}}
-Cookie: {{session_cookie}}
 
 ### 7) Update route
 PUT {{host}}/api/routes/{{route_id}}
 Content-Type: application/json
 X-XSRF-TOKEN: {{csrf_token}}
-Cookie: {{session_cookie}}
 
 {
   "title": "Обновлённый маршрут на вечер",
@@ -87,8 +77,6 @@ Cookie: {{session_cookie}}
 ### 8) Delete route
 DELETE {{host}}/api/routes/{{route_id}}
 X-XSRF-TOKEN: {{csrf_token}}
-Cookie: {{session_cookie}}
 
 ### 9) Verify 404 after delete
 GET {{host}}/api/routes/{{route_id}}
-Cookie: {{session_cookie}}
