@@ -14,8 +14,8 @@
             </div>
             <#if username?? && username == route.authorUsername()>
                 <div class="d-flex gap-2">
-                    <a class="btn btn-outline-secondary" href="/routes/${route.id()}/edit">Редактировать</a>
-                    <form method="post" action="/routes/${route.id()}/delete">
+                    <a class="btn btn-outline-secondary" href="${contextPath}/routes/${route.id()}/edit">Редактировать</a>
+                    <form method="post" action="${contextPath}/routes/${route.id()}/delete">
                         <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                         <button class="btn btn-outline-danger" type="submit">Удалить</button>
                     </form>
@@ -29,7 +29,7 @@
                     <li>
                         <div class="route-timeline-marker">${event?index + 1}</div>
                         <div class="route-timeline-content">
-                            <h3 class="h6 mb-1"><a href="/events/${event.id()}">${event.title()}</a></h3>
+                            <h3 class="h6 mb-1"><a href="${contextPath}/events/${event.id()}">${event.title()}</a></h3>
                             <p class="small muted mb-1">${event.timeLabel()} · ${event.venueName()} · ${event.districtName()}</p>
                             <p class="small mb-0"><#if event.price() == 0>Бесплатно<#else>${event.price()} ₽</#if><#if event.distanceKm()??> · ${event.distanceKm()} км от вас</#if></p>
                         </div>

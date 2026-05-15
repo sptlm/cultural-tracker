@@ -5,7 +5,7 @@
 <main class="page-shell">
     <div class="container">
         <h1>Редактировать профиль</h1>
-        <form class="card card-body shadow-sm" method="post" action="/profile">
+        <form class="card card-body shadow-sm" method="post" action="${contextPath}/profile">
             <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
             <label class="form-label">Имя пользователя</label>
             <input class="form-control" value="${username}" disabled>
@@ -35,7 +35,7 @@
 
             <div class="d-flex gap-2 mt-4">
                 <button class="btn btn-primary" type="submit">Сохранить</button>
-                <a class="btn btn-outline-secondary" href="/profile">Отмена</a>
+                <a class="btn btn-outline-secondary" href="${contextPath}/profile">Отмена</a>
             </div>
         </form>
     </div>

@@ -2,6 +2,9 @@
 // Так фронт использует те же пороги, что и Java-код: расстояние "рядом",
 // порог высокого рейтинга, радиус Земли для haversine и длительность toast.
 const APP_CONFIG = readAppConfig();
+// Приложение может жить не в корне домена, а под /cultural. Все клиентские URL
+// проходят через withContextPath(), чтобы AJAX, карточки и уведомления не уходили в корневой /api.
+const CONTEXT_PATH = normalizeContextPath(APP_CONFIG.contextPath);
 
 document.addEventListener('DOMContentLoaded', () => {
     // Spring Security кладет CSRF-токен в meta-теги общего layout.
@@ -75,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 eventsTarget.innerHTML = events.length
                     ? events.map(renderEventCard).join('')
                     : '<p class="muted">По этим фильтрам ничего не найдено.</p>';
-                history.replaceState(null, '', `/events?${params}`);
+                history.replaceState(null, '', withContextPath(`/events?${params}`));
             } catch (error) {
                 showNotice(error.message || 'Не удалось применить фильтры', 'danger');
             } finally {
@@ -116,7 +119,7 @@ function renderEventCard(event) {
     ].filter(Boolean).join('');
     return `
         <article class="col">
-            <div class="card h-100 shadow-sm clickable-card" data-card-href="/events/${event.id}">
+            <div class="card h-100 shadow-sm clickable-card" data-card-href="${withContextPath(`/events/${event.id}`)}">
                 ${event.imageUrl ? `<img class="event-img card-img-top" src="${escapeHtml(event.imageUrl)}" alt="${escapeHtml(event.title)}">` : ''}
                 <div class="card-body">
                     ${badges ? `<div class="event-badges mb-2">${badges}</div>` : ''}
@@ -364,7 +367,7 @@ function renderReview(review) {
 async function requestJson(url, options = {}) {
     let response;
     try {
-        response = await fetch(url, options);
+        response = await fetch(withContextPath(url), options);
     } catch (error) {
         throw new AjaxError('Сеть недоступна. Попробуйте ещё раз.', 0);
     }
@@ -391,7 +394,7 @@ class AjaxError extends Error {
 // когда реально нужно что-то показать пользователю.
 function showNotice(message, type = 'danger', action) {
     const host = document.querySelector('[data-notice-host]') || createNoticeHost();
-    const actionHtml = action ? `<a class="btn btn-sm btn-outline-dark ms-2" href="${escapeHtml(action.href)}">${escapeHtml(action.label)}</a>` : '';
+    const actionHtml = action ? `<a class="btn btn-sm btn-outline-dark ms-2" href="${escapeHtml(withContextPath(action.href))}">${escapeHtml(action.label)}</a>` : '';
     const notice = document.createElement('div');
     notice.className = `alert alert-${type} shadow-sm d-flex align-items-center justify-content-between gap-3`;
     notice.setAttribute('role', 'alert');
@@ -543,7 +546,8 @@ function readAppConfig() {
         distanceScale: 1,
         minRoutePoints: 2,
         toastDurationMs: 4500,
-        actionToastDurationMs: 8000
+        actionToastDurationMs: 8000,
+        contextPath: ''
     };
     const node = document.getElementById('app-config');
     if (!node) {
@@ -554,6 +558,25 @@ function readAppConfig() {
     } catch (error) {
         return fallback;
     }
+}
+
+function normalizeContextPath(contextPath) {
+    if (!contextPath || contextPath === '/') {
+        return '';
+    }
+    const normalized = String(contextPath).startsWith('/') ? String(contextPath) : `/${contextPath}`;
+    return normalized.endsWith('/') ? normalized.slice(0, -1) : normalized;
+}
+
+// Добавляет servlet context path только к внутренним абсолютным URL. Внешние ссылки,
+// относительные пути и уже подготовленные /cultural/... остаются как есть.
+function withContextPath(url) {
+    if (!url || !String(url).startsWith('/') || String(url).startsWith('//')) {
+        return url;
+    }
+    return CONTEXT_PATH && !String(url).startsWith(`${CONTEXT_PATH}/`) && url !== CONTEXT_PATH
+        ? `${CONTEXT_PATH}${url}`
+        : url;
 }
 
 function roundDistance(distanceKm) {

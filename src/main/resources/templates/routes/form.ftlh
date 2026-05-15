@@ -5,7 +5,7 @@
 <main class="page-shell">
     <div class="container">
         <h1><#if routeId??>Редактировать маршрут<#else>Создать маршрут</#if></h1>
-        <form class="card card-body shadow-sm" method="post" action="<#if routeId??>/routes/${routeId}<#else>/routes</#if>">
+        <form class="card card-body shadow-sm" method="post" action="<#if routeId??>${contextPath}/routes/${routeId}<#else>${contextPath}/routes</#if>">
             <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
             <label class="form-label">Название</label>
             <input class="form-control" name="title" value="${(routeForm.title)!}" required>
@@ -92,7 +92,7 @@
 
             <div class="d-flex gap-2 mt-4">
                 <button class="btn btn-primary" type="submit">Сохранить</button>
-                <a class="btn btn-outline-secondary" href="/routes">Отмена</a>
+                <a class="btn btn-outline-secondary" href="${contextPath}/routes">Отмена</a>
             </div>
         </form>
     </div>

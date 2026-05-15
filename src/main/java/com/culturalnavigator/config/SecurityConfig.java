@@ -35,16 +35,16 @@ public class SecurityConfig {
                         .permitAll())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {
-                            if (request.getRequestURI().startsWith("/api/")) {
+                            if (isApiRequest(request.getServletPath())) {
                                 response.setStatus(401);
                                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                                 response.getWriter().write("{\"status\":\"error\",\"message\":\"Требуется вход\"}");
                                 return;
                             }
-                            response.sendRedirect("/login");
+                            response.sendRedirect(request.getContextPath() + "/login");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            if (request.getRequestURI().startsWith("/api/")) {
+                            if (isApiRequest(request.getServletPath())) {
                                 response.setStatus(403);
                                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                                 response.getWriter().write("{\"status\":\"error\",\"message\":\"Доступ запрещён\"}");
@@ -60,5 +60,9 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    private boolean isApiRequest(String servletPath) {
+        return servletPath != null && servletPath.startsWith("/api/");
     }
 }

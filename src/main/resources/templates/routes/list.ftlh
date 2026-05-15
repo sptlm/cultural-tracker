@@ -4,12 +4,12 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0">Маршруты</h1>
-            <a class="btn btn-primary" href="/routes/new">Создать маршрут</a>
+            <a class="btn btn-primary" href="${contextPath}/routes/new">Создать маршрут</a>
         </div>
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
             <#list routes as route>
                 <article class="col">
-                    <div class="card h-100 shadow-sm clickable-card" data-card-href="/routes/${route.id()}">
+                    <div class="card h-100 shadow-sm clickable-card" data-card-href="${contextPath}/routes/${route.id()}">
                         <div class="card-body">
                             <h2 class="h5">${route.title()}</h2>
                             <p class="muted">${route.description()}</p>

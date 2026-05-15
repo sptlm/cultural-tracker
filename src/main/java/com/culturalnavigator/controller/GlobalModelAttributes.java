@@ -1,6 +1,7 @@
 package com.culturalnavigator.controller;
 
 import com.culturalnavigator.config.AppProperties;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,6 +27,11 @@ public class GlobalModelAttributes {
                     .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
         }
         return false;
+    }
+
+    @ModelAttribute("contextPath")
+    public String contextPath(HttpServletRequest request) {
+        return request.getContextPath();
     }
 
     @ModelAttribute("frontendConfig")

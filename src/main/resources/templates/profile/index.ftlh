@@ -9,8 +9,8 @@
                 <p class="muted mb-0">${username} · ${(profileForm.email)!}</p>
             </div>
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-secondary" href="/profile/edit">Редактировать профиль</a>
-                <a class="btn btn-primary" href="/routes/new">Создать маршрут</a>
+                <a class="btn btn-outline-secondary" href="${contextPath}/profile/edit">Редактировать профиль</a>
+                <a class="btn btn-primary" href="${contextPath}/routes/new">Создать маршрут</a>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
         <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
             <#list routes as route>
                 <article class="col">
-                    <div class="card h-100 shadow-sm clickable-card" data-card-href="/routes/${route.id()}">
+                    <div class="card h-100 shadow-sm clickable-card" data-card-href="${contextPath}/routes/${route.id()}">
                         <div class="card-body">
                             <div class="d-flex justify-content-between gap-2">
                                 <h3 class="h5">${route.title()}</h3>
@@ -48,8 +48,8 @@
                                 <#if route.distanceKm()?? && route.distanceKm() gt 0> · ${route.distanceKm()} км</#if>
                             </p>
                             <div class="d-flex gap-2">
-                                <a class="btn btn-sm btn-outline-secondary" href="/routes/${route.id()}/edit">Редактировать</a>
-                                <form method="post" action="/routes/${route.id()}/delete">
+                                <a class="btn btn-sm btn-outline-secondary" href="${contextPath}/routes/${route.id()}/edit">Редактировать</a>
+                                <form method="post" action="${contextPath}/routes/${route.id()}/delete">
                                     <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
                                 </form>

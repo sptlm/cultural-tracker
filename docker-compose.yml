@@ -1,6 +1,13 @@
 services:
   app:
     build: .
+    ports:
+      - "${APP_HOST_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       DB_URL: jdbc:postgresql://db:5432/cultural_navigator
       DB_USER: cultural_user
@@ -8,6 +15,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       APP_PORT: 8080
+      SERVER_SERVLET_CONTEXT_PATH: /cultural
       YANDEX_GEOCODER_API_KEY: ${YANDEX_GEOCODER_API_KEY:-}
     networks:
       - web_network
@@ -15,18 +23,22 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=web_network
-      - traefik.http.routers.cultural.rule=Host(`ne.${DOMAIN}`)
+      - traefik.http.routers.cultural.rule=(Host(`${DOMAIN}`) || Host(`${IP_HOST}`)) && PathPrefix(`/cultural`)
       - traefik.http.routers.cultural.entrypoints=web,websecure
       - traefik.http.routers.cultural.tls.certresolver=myresolver
       - traefik.http.routers.cultural.service=cultural
       - traefik.http.services.cultural.loadbalancer.server.port=8080
-
   db:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: cultural_navigator
       POSTGRES_USER: cultural_user
       POSTGRES_PASSWORD: cultural_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cultural_user -d cultural_navigator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - cultural_pg_data:/var/lib/postgresql/data
     networks:
@@ -34,6 +46,11 @@ services:
 
   redis:
     image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - cultural_internal
 

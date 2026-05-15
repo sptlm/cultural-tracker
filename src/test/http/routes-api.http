@@ -1,6 +1,6 @@
 ### Cultural Navigator Routes API checks
 ### Base URL
-@host = http://localhost:8080
+@host = http://localhost:8080/cultural
 
 ### 1) Open login page and capture login CSRF token
 # @name loginPage

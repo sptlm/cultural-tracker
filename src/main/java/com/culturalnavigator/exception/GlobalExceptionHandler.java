@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
     private boolean wantsJson(HttpServletRequest request) {
         String requestedWith = request.getHeader("X-Requested-With");
         String accept = request.getHeader("Accept");
-        return request.getRequestURI().startsWith("/api/")
+        return request.getServletPath().startsWith("/api/")
                 || "XMLHttpRequest".equals(requestedWith)
                 || (accept != null && accept.contains("application/json"));
     }

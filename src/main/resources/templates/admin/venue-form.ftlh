@@ -4,7 +4,7 @@
 <main class="page-shell">
     <div class="container">
         <h1><#if venueId??>Редактировать площадку<#else>Новая площадка</#if></h1>
-        <form class="card card-body shadow-sm" method="post" action="<#if venueId??>/admin/venues/${venueId}<#else>/admin/venues</#if>">
+        <form class="card card-body shadow-sm" method="post" action="<#if venueId??>${contextPath}/admin/venues/${venueId}<#else>${contextPath}/admin/venues</#if>">
             <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
             <label class="form-label">Название</label>
             <input class="form-control" name="name" value="${(venueForm.name)!}" required>
@@ -24,7 +24,7 @@
             </select>
             <div class="d-flex gap-2 mt-4">
                 <button class="btn btn-primary" type="submit">Сохранить</button>
-                <a class="btn btn-outline-secondary" href="/admin">Отмена</a>
+                <a class="btn btn-outline-secondary" href="${contextPath}/admin">Отмена</a>
             </div>
         </form>
     </div>

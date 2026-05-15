@@ -10,7 +10,7 @@
     <div class="container">
         <div class="row g-4">
             <aside class="col-lg-3">
-                <form class="card card-body shadow-sm" method="get" action="/events" data-event-filter>
+                <form class="card card-body shadow-sm" method="get" action="${contextPath}/events" data-event-filter>
                     <h1 class="h4">Фильтры</h1>
                     <label class="form-label mt-2">Поиск</label>
                     <input class="form-control" type="search" name="query" value="${(filter.query)!}">
@@ -85,7 +85,7 @@
                         <h1 class="h2 mb-1">Культурный навигатор Казани</h1>
                         <p class="muted mb-0">Афиша мероприятий по районам и площадкам Казани.</p>
                     </div>
-                    <a class="btn btn-outline-secondary" href="/routes/new">Собрать маршрут</a>
+                    <a class="btn btn-outline-secondary" href="${contextPath}/routes/new">Собрать маршрут</a>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-4" data-events-target>
                     <#list events as event>

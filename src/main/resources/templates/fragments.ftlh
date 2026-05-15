@@ -1,6 +1,6 @@
 <#macro eventCard event>
 <article class="col">
-    <div class="card h-100 shadow-sm clickable-card" data-card-href="/events/${event.id()}">
+    <div class="card h-100 shadow-sm clickable-card" data-card-href="${contextPath}/events/${event.id()}">
         <#if event.imageUrl()?has_content>
             <img class="event-img card-img-top" src="${event.imageUrl()}" alt="${event.title()}">
         </#if>

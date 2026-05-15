@@ -19,7 +19,7 @@
                     </#list>
                 </div>
                 <p><strong>Время:</strong> ${event.timeLabel()}</p>
-                <p><strong>Площадка:</strong> <a href="/venues/${event.venueId()}">${event.venueName()}</a></p>
+                <p><strong>Площадка:</strong> <a href="${contextPath}/venues/${event.venueId()}">${event.venueName()}</a></p>
                 <p><strong>Район:</strong> ${event.districtName()}</p>
                 <p><strong>Стоимость:</strong> <#if event.price() == 0>Бесплатно<#else>${event.price()} ₽</#if></p>
                 <p><strong>Отзывы:</strong> <#if event.reviewsCount() == 0>нет оценок<#else>рейтинг ${event.ratingLabel()} на основе ${event.reviewsCount()} отзывов</#if></p>
@@ -45,7 +45,7 @@
                             </form>
                             <div class="small" data-review-status aria-live="polite"></div>
                         <#else>
-                            <p><a href="/login">Войдите</a>, чтобы оставить отзыв.</p>
+                            <p><a href="${contextPath}/login">Войдите</a>, чтобы оставить отзыв.</p>
                         </#if>
                         <div data-reviews-list data-event-id="${event.id()}">
                             <#list reviews as review>

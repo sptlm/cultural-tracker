@@ -8,8 +8,8 @@
                 <p class="muted mb-0">Управление афишей, площадками, маршрутами и справочниками.</p>
             </div>
             <div class="d-flex gap-2">
-                <a class="btn btn-outline-primary" href="/admin/events/new">Добавить мероприятие</a>
-                <a class="btn btn-primary" href="/admin/venues/new">Добавить площадку</a>
+                <a class="btn btn-outline-primary" href="${contextPath}/admin/events/new">Добавить мероприятие</a>
+                <a class="btn btn-primary" href="${contextPath}/admin/venues/new">Добавить площадку</a>
             </div>
         </div>
 
@@ -49,12 +49,12 @@
                         <tbody>
                         <#list events as event>
                             <tr data-admin-row data-filter-text="${event.title()} ${event.timeLabel()} ${event.venueName()} ${event.districtName()} ${event.ratingLabel()}">
-                                <td><a href="/events/${event.id()}">${event.title()}</a></td>
+                                <td><a href="${contextPath}/events/${event.id()}">${event.title()}</a></td>
                                 <td>${event.timeLabel()}</td>
-                                <td><a href="/venues/${event.venueId()}">${event.venueName()}</a></td>
+                                <td><a href="${contextPath}/venues/${event.venueId()}">${event.venueName()}</a></td>
                                 <td>${event.districtName()}</td>
                                 <td><#if event.reviewsCount() == 0>Нет оценок<#else>${event.ratingLabel()}</#if></td>
-                                <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="/admin/events/${event.id()}/edit">Править</a></td>
+                                <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="${contextPath}/admin/events/${event.id()}/edit">Править</a></td>
                             </tr>
                         <#else>
                             <tr><td colspan="6" class="muted">Мероприятий пока нет.</td></tr>
@@ -80,11 +80,11 @@
                             <#assign districtName = (venue.cityDistrict.name)!"Не указан">
                             <#assign coords><#if venue.latitude?? && venue.longitude??>${venue.latitude}, ${venue.longitude}<#else>Не указаны</#if></#assign>
                             <tr data-admin-row data-filter-text="${venue.name} ${venue.address} ${districtName} ${coords}">
-                                <td><a href="/venues/${venue.id}">${venue.name}</a></td>
+                                <td><a href="${contextPath}/venues/${venue.id}">${venue.name}</a></td>
                                 <td>${venue.address}</td>
                                 <td>${districtName}</td>
                                 <td>${coords}</td>
-                                <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="/admin/venues/${venue.id}/edit">Править</a></td>
+                                <td class="text-end"><a class="btn btn-sm btn-outline-secondary" href="${contextPath}/admin/venues/${venue.id}/edit">Править</a></td>
                             </tr>
                         <#else>
                             <tr><td colspan="5" class="muted">Площадок пока нет.</td></tr>
@@ -109,11 +109,11 @@
                         <#list reviews as review>
                             <tr data-admin-row data-filter-text="${review.author} ${review.eventTitle} ${review.rating} ${review.text}">
                                 <td>${review.author}</td>
-                                <td><a href="/events/${review.eventId}">${review.eventTitle}</a></td>
+                                <td><a href="${contextPath}/events/${review.eventId}">${review.eventTitle}</a></td>
                                 <td>${review.rating}/5</td>
                                 <td>${review.text}</td>
                                 <td class="text-end">
-                                    <form method="post" action="/admin/reviews/${review.id}/delete">
+                                    <form method="post" action="${contextPath}/admin/reviews/${review.id}/delete">
                                         <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                         <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
                                     </form>
@@ -142,14 +142,14 @@
                         <#list routes as route>
                             <#assign routeStatus = route.isPublic()?then("Публичный", "Личный")>
                             <tr data-admin-row data-filter-text="${route.title()} ${route.description()} ${route.authorUsername()} ${routeStatus}">
-                                <td><a href="/routes/${route.id()}">${route.title()}</a></td>
+                                <td><a href="${contextPath}/routes/${route.id()}">${route.title()}</a></td>
                                 <td>${route.authorUsername()}</td>
                                 <td>${routeStatus}</td>
                                 <td>${route.events()?size} точек · ${route.durationMinutes()} мин · ${route.budget()} ₽<#if route.distanceKm()?? && route.distanceKm() gt 0> · ${route.distanceKm()} км</#if></td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a class="btn btn-sm btn-outline-secondary" href="/routes/${route.id()}/edit">Править</a>
-                                        <form method="post" action="/admin/routes/${route.id()}/delete">
+                                        <a class="btn btn-sm btn-outline-secondary" href="${contextPath}/routes/${route.id()}/edit">Править</a>
+                                        <form method="post" action="${contextPath}/admin/routes/${route.id()}/delete">
                                             <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                             <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
                                         </form>
@@ -170,7 +170,7 @@
                         <h2 class="h4 mb-1">Категории</h2>
                         <p class="muted mb-0">${categories?size} записей</p>
                     </div>
-                    <form class="d-flex gap-2 admin-inline-form" method="post" action="/admin/categories">
+                    <form class="d-flex gap-2 admin-inline-form" method="post" action="${contextPath}/admin/categories">
                         <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                         <input class="form-control" name="name" placeholder="Новая категория" required>
                         <button class="btn btn-primary" type="submit">Добавить</button>
@@ -179,12 +179,12 @@
                 <div class="d-grid gap-2">
                     <#list categories as category>
                         <div class="admin-category-row">
-                            <form class="d-flex gap-2" method="post" action="/admin/categories/${category.id}">
+                            <form class="d-flex gap-2" method="post" action="${contextPath}/admin/categories/${category.id}">
                                 <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                 <input class="form-control form-control-sm" name="name" value="${category.name}" required>
                                 <button class="btn btn-sm btn-outline-secondary" type="submit">Сохранить</button>
                             </form>
-                            <form method="post" action="/admin/categories/${category.id}/delete">
+                            <form method="post" action="${contextPath}/admin/categories/${category.id}/delete">
                                 <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                 <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
                             </form>
@@ -201,7 +201,7 @@
                         <h2 class="h4 mb-1">Районы</h2>
                         <p class="muted mb-0">${districts?size} записей</p>
                     </div>
-                    <form class="d-flex gap-2 admin-inline-form" method="post" action="/admin/districts">
+                    <form class="d-flex gap-2 admin-inline-form" method="post" action="${contextPath}/admin/districts">
                         <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                         <input class="form-control" name="name" placeholder="Новый район" required>
                         <button class="btn btn-primary" type="submit">Добавить</button>
@@ -210,12 +210,12 @@
                 <div class="d-grid gap-2">
                     <#list districts as district>
                         <div class="admin-category-row">
-                            <form class="d-flex gap-2" method="post" action="/admin/districts/${district.id}">
+                            <form class="d-flex gap-2" method="post" action="${contextPath}/admin/districts/${district.id}">
                                 <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                 <input class="form-control form-control-sm" name="name" value="${district.name}" required>
                                 <button class="btn btn-sm btn-outline-secondary" type="submit">Сохранить</button>
                             </form>
-                            <form method="post" action="/admin/districts/${district.id}/delete">
+                            <form method="post" action="${contextPath}/admin/districts/${district.id}/delete">
                                 <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                                 <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
                             </form>

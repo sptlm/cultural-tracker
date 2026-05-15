@@ -16,7 +16,7 @@
                 <div class="alert alert-success">Вы вышли из аккаунта.</div>
             </#if>
 
-            <form action="/login" method="post" class="auth-form">
+            <form action="${contextPath}/login" method="post" class="auth-form">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 
                 <label class="form-label" for="username">Имя пользователя</label>
@@ -28,7 +28,7 @@
                 <button type="submit" class="btn btn-primary w-100 mt-4">Войти</button>
             </form>
 
-            <p class="auth-switch">Еще нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+            <p class="auth-switch">Еще нет аккаунта? <a href="${contextPath}/register">Зарегистрироваться</a></p>
         </div>
     </section>
 </main>

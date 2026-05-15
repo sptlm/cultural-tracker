@@ -5,7 +5,7 @@
         <div class="card card-body shadow-sm">
             <h1>500</h1>
             <p class="lead">${(message)!"Внутренняя ошибка сервера"}</p>
-            <a class="btn btn-primary" href="/">На главную</a>
+            <a class="btn btn-primary" href="${contextPath}/">На главную</a>
         </div>
     </div>
 </main>

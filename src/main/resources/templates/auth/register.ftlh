@@ -7,18 +7,18 @@
             <p class="auth-eyebrow">Новый аккаунт</p>
             <h1>Регистрация</h1>
 
-            <form action="/register" method="post" class="auth-form">
+            <form action="${contextPath}/register" method="post" class="auth-form">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 
                 <label class="form-label" for="username">Имя пользователя</label>
-                <input id="username" class="form-control" type="text" name="username" value="${(registrationRequest.username)!}" autocomplete="username" required autofocus data-check-field="/api/auth/check-username" data-check-target="#usernameAvailability">
+                <input id="username" class="form-control" type="text" name="username" value="${(registrationRequest.username)!}" autocomplete="username" required autofocus data-check-field="${contextPath}/api/auth/check-username" data-check-target="#usernameAvailability">
                 <span id="usernameAvailability" class="small"></span>
                 <#if errors?has_content && errors.hasFieldErrors("username")>
                     <div class="form-error">${errors.getFieldError("username").defaultMessage}</div>
                 </#if>
 
                 <label class="form-label mt-3" for="email">Email</label>
-                <input id="email" class="form-control" type="email" name="email" value="${(registrationRequest.email)!}" autocomplete="email" required data-check-field="/api/auth/check-email" data-check-target="#emailAvailability">
+                <input id="email" class="form-control" type="email" name="email" value="${(registrationRequest.email)!}" autocomplete="email" required data-check-field="${contextPath}/api/auth/check-email" data-check-target="#emailAvailability">
                 <span id="emailAvailability" class="small"></span>
                 <#if errors?has_content && errors.hasFieldErrors("email")>
                     <div class="form-error">${errors.getFieldError("email").defaultMessage}</div>
@@ -39,7 +39,7 @@
                 <button type="submit" class="btn btn-primary w-100 mt-4">Создать аккаунт</button>
             </form>
 
-            <p class="auth-switch">Уже есть аккаунт? <a href="/login">Войти</a></p>
+            <p class="auth-switch">Уже есть аккаунт? <a href="${contextPath}/login">Войти</a></p>
         </div>
     </section>
 </main>

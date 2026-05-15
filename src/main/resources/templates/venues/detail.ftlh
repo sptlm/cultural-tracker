@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row g-4">
             <section class="col-lg-8">
-                <a class="text-decoration-none" href="/venues">Все площадки</a>
+                <a class="text-decoration-none" href="${contextPath}/venues">Все площадки</a>
                 <h1 class="mt-3">${venue.name}</h1>
                 <p class="lead muted">${venue.description}</p>
                 <div class="card shadow-sm mb-4">

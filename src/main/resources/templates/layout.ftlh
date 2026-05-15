@@ -1,4 +1,5 @@
 <#macro page title>
+<#assign cp = contextPath!''>
 <!doctype html>
 <html lang="ru">
 <head>
@@ -10,34 +11,34 @@
     </#if>
     <title>${title} | Культурный навигатор</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="${cp}/css/app.css">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand" href="/">Культурный навигатор</a>
+        <a class="navbar-brand" href="${cp}/">Культурный навигатор</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" href="/events">События</a></li>
-                <li class="nav-item"><a class="nav-link" href="/venues">Площадки</a></li>
-                <li class="nav-item"><a class="nav-link" href="/routes">Маршруты</a></li>
+                <li class="nav-item"><a class="nav-link" href="${cp}/events">События</a></li>
+                <li class="nav-item"><a class="nav-link" href="${cp}/venues">Площадки</a></li>
+                <li class="nav-item"><a class="nav-link" href="${cp}/routes">Маршруты</a></li>
             </ul>
             <div class="d-flex gap-2">
                 <#if username??>
                     <#if isAdmin?? && isAdmin>
-                        <a class="btn btn-outline-primary" href="/admin">Админка</a>
+                        <a class="btn btn-outline-primary" href="${cp}/admin">Админка</a>
                     </#if>
-                    <a class="btn btn-outline-secondary" href="/profile">Профиль</a>
-                    <form action="/logout" method="post">
+                    <a class="btn btn-outline-secondary" href="${cp}/profile">Профиль</a>
+                    <form action="${cp}/logout" method="post">
                         <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
                         <button class="btn btn-outline-secondary" type="submit">Выйти</button>
                     </form>
                 <#else>
-                    <a class="btn btn-outline-secondary" href="/login">Войти</a>
-                    <a class="btn btn-primary" href="/register">Регистрация</a>
+                    <a class="btn btn-outline-secondary" href="${cp}/login">Войти</a>
+                    <a class="btn btn-primary" href="${cp}/register">Регистрация</a>
                 </#if>
             </div>
         </div>
@@ -63,11 +64,12 @@
     "distanceScale": ${(frontendConfig.distanceScale!1)?c},
     "minRoutePoints": ${(frontendConfig.minRoutePoints!2)?c},
     "toastDurationMs": ${(frontendConfig.toastDurationMs!4500)?c},
-    "actionToastDurationMs": ${(frontendConfig.actionToastDurationMs!8000)?c}
+    "actionToastDurationMs": ${(frontendConfig.actionToastDurationMs!8000)?c},
+    "contextPath": "${cp?js_string}"
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/js/app.js"></script>
+<script src="${cp}/js/app.js"></script>
 </body>
 </html>
 </#macro>

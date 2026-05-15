@@ -5,7 +5,7 @@
 <main class="page-shell">
     <div class="container">
         <h1><#if eventId??>Редактировать мероприятие<#else>Создать мероприятие</#if></h1>
-        <form class="card card-body shadow-sm" method="post" action="<#if eventId??>/admin/events/${eventId}<#else>/admin/events</#if>">
+        <form class="card card-body shadow-sm" method="post" action="<#if eventId??>${contextPath}/admin/events/${eventId}<#else>${contextPath}/admin/events</#if>">
             <#if _csrf??><input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"></#if>
 
             <label class="form-label">Название</label>
@@ -63,7 +63,7 @@
 
             <div class="d-flex gap-2 mt-4">
                 <button class="btn btn-primary" type="submit">Сохранить</button>
-                <a class="btn btn-outline-secondary" href="/admin">Отмена</a>
+                <a class="btn btn-outline-secondary" href="${contextPath}/admin">Отмена</a>
             </div>
         </form>
     </div>
